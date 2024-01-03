@@ -54,7 +54,7 @@ class OAuth {
 
       // TODO: expiry time (and every other feature...)
       res("todo");
-    })
+    });
   }
 }
 
