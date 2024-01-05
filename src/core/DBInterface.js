@@ -1,12 +1,17 @@
 const hashing = require("./util/hash.js");
 
+// TODO: improve property description of HashProvider
 /**
  * @typedef HashProvider
  * @description An object containing a function to hash a password/token and one to verify a hash
- * @property {function(token: string): string} hash Hashes a given token and returns a string with the hashing result. The format of said string is left to the implementation
- * @property {function(token: string, hash: string): boolean} verifyHash Compares a token and a hash. The format of the hash is left to the implementation.
+ * @property {function} hash Hashes a given token and returns a string with the hashing result. The format of said string is left to the implementation
+ * @property {function} verifyHash Compares a token and a hash. The format of the hash is left to the implementation.
  */
 
+/**
+ * @class
+ * @classdesc An interface documenting methods and properties that have to implemented
+ */
 class DBInterface {
   /** @type {HashProvider} */
   hashProvider = hashing;
@@ -24,6 +29,7 @@ class DBInterface {
    *
    * @param  {string} clientId  The client id of the app
    * @return {Promise<AppInfo>} The data from the databse
+   * @abstract
    */
   fetchAppInfo(clientId) {
     throw "fetchAppInfo has to be implemented";
