@@ -10,7 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "express": "^4.18.2",
-    "express-session": "^1.17.3"
+    "express-session": "^1.17.3",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "uuid": "^9.0.1"
