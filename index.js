@@ -2,7 +2,9 @@ module.exports = {
   ...require("./src/index.js")
 };
 
-const middleware = require("./src/index.js").middleware.express;
+const { express: middleware } = require("./src/index.js").middleware;
+const { mysql: Database } = require("./src/index.js").interface;
+const { OAuth } = require("./src/index.js");
 
 const express = require("express");
 const session = require("express-session");
@@ -18,13 +20,30 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded());
 
-app.use("/", middleware());
+const mysql = new Database({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "strafe"
+}, {
+  appTable: "apps"
+});
+
+const core = new OAuth(mysql);
+core.createApp("test", "this is a test app").then(console.log);
+app.use("/", middleware(core));
 
 app.all("/token", (req, res) => {
-  if (!req.success) {
+  if (!req.oauth.success) {
     return res.send({ error: "an error occured" });
   }
-  res.send({ success: "success", body: req.authData });
+  res.send({ success: "success", body: req.auth.authData });
+});
+app.get("/auth", (req, res) => {
+  if (!req.oauth.success) {
+    return res.send({ error: "an error occured: " + req.oauth.error });
+  }
+  res.send({ ...req.oauth.data });
 })
 
 app.get("/", (_req, res) => res.send("hi world"))

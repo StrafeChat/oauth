@@ -23,11 +23,13 @@ function middleware(core) {
     switch(req.path) {
       case "/token":
         if (req.method !== "POST") {
-          req.success = false;
+          req.oauth = {
+            success: false
+          }
           return next();
         }
 
-        const data = {
+        var data = {
           grantType: req["grant_type"],
           token: req.code,
           redirectUri: req["redirect_uri"],
@@ -37,8 +39,52 @@ function middleware(core) {
 
         const token = await core.grantToken(data);
 
-        req.success = true;
-        req.authData = { token };
+        req.oauth = {
+          success: true,
+          authData: { token }
+        }
+        next();
+      break;
+      case "/auth":
+        // TODO: move to core appropriately
+        const type = req.query.response_type; // TODO: implement different response types
+        if (type !== "code") {
+          req.oauth = {
+            success: false,
+            error: "invalid response type requested"
+          }
+          return next();
+        }
+        const clientId = req.query.client_id;
+        const redirectUri = req.query.redirect_uri;
+        const scope = req.query.scope; // TODO: implement scoping
+        if (!clientId || !redirectUri || !scope) {
+          req.oauth = {
+            success: false,
+            error: "invalid request"
+          }
+          return next();
+        }
+
+        var data = await core.db.fetchAppInfo(clientId);
+        if (!data) {
+          req.oauth = {
+            success: false,
+            error: "unknown client id"
+          }
+          return next();
+        }
+
+        // TODO: verify redirectUri
+        req.oauth = {
+          success: true,
+          data: {
+            scopes: core.parseScopes(scope),
+            state: req.query.state,
+            redirectUri,
+            ...data
+          }
+        }
         next();
       break;
       default:

@@ -28,4 +28,8 @@ function verify(token, hash) {
   });
 }
 
-module.exports = { hash, verify };
+function token() {
+  return crypto.randomBytes(64).toString("hex");
+}
+
+module.exports = { hash, verify, token };

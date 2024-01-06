@@ -56,6 +56,16 @@ class OAuth {
       res("todo");
     });
   }
+
+  // TODO: documenting
+  // TODO: verify/sanitize scopes
+  parseScopes(queryString) {
+    return queryString.split("+"); // TODO: add information about scopes
+  }
+
+  createApp(name, description) {
+    return this.db.createApp(this.uuid(), name, description);
+  }
 }
 
 
